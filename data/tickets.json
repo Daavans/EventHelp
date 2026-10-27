@@ -1,0 +1,19 @@
+{
+  "tickets": [
+    {"ticket_number": "RF100001", "name": "Sanne de Vries", "type": "weekend", "status": "valid"},
+    {"ticket_number": "RF100002", "name": "Mohamed El Amrani", "type": "camping", "status": "valid"},
+    {"ticket_number": "RF100003", "name": "Lotte Jansen", "type": "day", "day": "saturday", "status": "valid"},
+    {"ticket_number": "RF100004", "name": "Thomas Bakker", "type": "day", "day": "friday", "status": "used"},
+    {"ticket_number": "RF100005", "name": "Eva Visser", "type": "weekend", "status": "cancelled"},
+    {"ticket_number": "RF100006", "name": "Daan Smit", "type": "camping", "status": "valid"},
+    {"ticket_number": "RF100007", "name": "Noor Hendriks", "type": "day", "day": "sunday", "status": "valid"},
+    {"ticket_number": "RF100008", "name": "Lucas Mulder", "type": "weekend", "status": "used"},
+    {"ticket_number": "RF100009", "name": "Fatima Yilmaz", "type": "day", "day": "friday", "status": "cancelled"},
+    {"ticket_number": "RF100010", "name": "Bram van Dijk", "type": "camping", "status": "valid"}
+  ],
+  "parking": {
+    "friday": {"total": 800, "available": 214},
+    "saturday": {"total": 800, "available": 0},
+    "sunday": {"total": 800, "available": 532}
+  }
+}
