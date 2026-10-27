@@ -1,0 +1,12 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Generated embedding cache (rebuilt on first run)
+data/*.npy
+data/embeddings_cache.*
