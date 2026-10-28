@@ -17,8 +17,9 @@ CHAT_MODELS = ["gemini-flash-lite-latest", "gemini-flash-latest"]
 # which returns one vector per text.
 EMBEDDING_MODEL = "gemini-embedding-001"
 
-# 429 = rate limit hit, 503 = model overloaded. Both are temporary, so worth retrying.
-RETRYABLE_STATUS_CODES = {429, 503}
+# 429 = rate limit hit, 500/503/504 = server error, overloaded or timed out.
+# All are temporary, so worth retrying.
+RETRYABLE_STATUS_CODES = {429, 500, 503, 504}
 MAX_ATTEMPTS = 3
 REQUEST_TIMEOUT_MS = 30_000  # give up on a single request after 30 seconds
 

@@ -7,5 +7,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Phase 1: run the smoke test. Will become the Streamlit app in a later phase.
-CMD ["python", "hello.py"]
+# Lets "from src.... import ..." work when Streamlit runs src/app.py.
+ENV PYTHONPATH=/app
+
+EXPOSE 8501
+CMD ["streamlit", "run", "src/app.py", "--server.address=0.0.0.0", "--server.headless=true"]
