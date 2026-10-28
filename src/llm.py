@@ -3,6 +3,7 @@
 import os
 import time
 
+import httpx
 from dotenv import load_dotenv
 from google import genai
 from google.genai import errors, types
@@ -31,16 +32,24 @@ def get_client() -> genai.Client:
     return genai.Client(api_key=api_key, http_options=types.HttpOptions(timeout=REQUEST_TIMEOUT_MS))
 
 
+def _is_temporary(error: Exception) -> bool:
+    """True for errors that may go away if we try again."""
+    if isinstance(error, errors.APIError):
+        return error.code in RETRYABLE_STATUS_CODES
+    # Network problems such as a dropped connection or a timeout.
+    return isinstance(error, httpx.TransportError)
+
+
 def _with_retry(call):
     """Run an API call, retrying temporary errors with exponential backoff (2s, 4s, ...)."""
     for attempt in range(MAX_ATTEMPTS):
         try:
             return call()
-        except errors.APIError as e:
-            if e.code not in RETRYABLE_STATUS_CODES or attempt == MAX_ATTEMPTS - 1:
+        except (errors.APIError, httpx.TransportError) as e:
+            if not _is_temporary(e) or attempt == MAX_ATTEMPTS - 1:
                 raise
             wait = 2 ** (attempt + 1)
-            print(f"API returned {e.code}, retrying in {wait}s...")
+            print(f"Temporary error ({e}), retrying in {wait}s...")
             time.sleep(wait)
 
 
@@ -52,8 +61,8 @@ def generate(contents, config=None):
             return _with_retry(
                 lambda: client.models.generate_content(model=model, contents=contents, config=config)
             )
-        except errors.APIError as e:
-            if e.code not in RETRYABLE_STATUS_CODES:
+        except (errors.APIError, httpx.TransportError) as e:
+            if not _is_temporary(e):
                 raise
             print(f"{model} is unavailable, trying the next model...")
     raise RuntimeError("All models are unavailable right now. Please try again later.")
