@@ -10,8 +10,9 @@ from google.genai import errors, types
 load_dotenv()
 
 # Aliases that always point to the newest models (both available on the free tier).
-# If the main model is overloaded, we fall back to the lighter one.
-CHAT_MODELS = ["gemini-flash-latest", "gemini-flash-lite-latest"]
+# Flash-Lite is fast and handles our tools well; Flash is the fallback.
+# (On the free tier Flash is often overloaded and returns 503.)
+CHAT_MODELS = ["gemini-flash-lite-latest", "gemini-flash-latest"]
 # Note: gemini-embedding-2 merges a list of texts into ONE vector, so we use 001,
 # which returns one vector per text.
 EMBEDDING_MODEL = "gemini-embedding-001"
@@ -19,13 +20,14 @@ EMBEDDING_MODEL = "gemini-embedding-001"
 # 429 = rate limit hit, 503 = model overloaded. Both are temporary, so worth retrying.
 RETRYABLE_STATUS_CODES = {429, 503}
 MAX_ATTEMPTS = 3
+REQUEST_TIMEOUT_MS = 30_000  # give up on a single request after 30 seconds
 
 
 def get_client() -> genai.Client:
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY is not set. Copy .env.example to .env and fill it in.")
-    return genai.Client(api_key=api_key)
+    return genai.Client(api_key=api_key, http_options=types.HttpOptions(timeout=REQUEST_TIMEOUT_MS))
 
 
 def _with_retry(call):
